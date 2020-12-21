@@ -1,1 +1,65 @@
 https://vntalking.com/debug-ung-dung-react-native.html
+
+Setup live android
+
+Từng bước cài đặt Debug React Native trên thiết bị thật
+Bước 1:  Bật Developer options trên thiết bị Android. Nếu đã option này đã bật trước đó rồi thì bạn có thể chỉ cần bỏ qua bước này.
+
+Đi đến Settings -> About phone/device -> hãy touch vào Build number khoảng 5 lần.
+Quay lại Settings và kết nối thiết bị Android của bạn với PC qua USB cable.
+Bước 2:  Bật USB debugging trên thiết bị Android
+
+Cách debug ứng dụng React Native trên thiết bị thật
+
+Bước 3:
+
+Truy cập thư mục platform-tools ở trong thư mục Android SDK trên PC. Sau đó nhập cmd vào thanh địa chỉ để mở command prompt với đường dẫn trỏ đến platform-tool
+
+Lưu ý: Đường dẫn cài đặt Android SDK có thể khác trên máy tính của bạn
+
+Như trên máy tính của mình thì như sau:
+
+Cách debug ứng dụng React Native trên thiết bị thật
+
+Bước 4:  Để kiểm tra xem thiết bị của bạn có được kết nối đúng với ADB hay không. Bạn chỉ gõ lệnh sau trong command prompt.
+
+adb devices
+Nếu thiết bị của bạn được kết nối đúng với ADB thì bạn sẽ nhận được kết quả sau:
+
+Cách debug ứng dụng React Native trên thiết bị thật
+
+Lưu ý: Chỉ có một thiết bị được phép kết nối tại một thời điểm.
+
+Bước 5:  Gõ lệnh sau trong command prompt để sử dụng các chức năng development server trên thiết bị của bạn.
+
+adb reverse tcp:8081 tcp:8081
+Nếu thành công thì thiết bị của bạn đã sẵn sàng để phát triển ứng dụng React native.
+
+Bước 6: Bây giờ, hãy thử truy cập thư mục dự án react native và gõ lệnh sau trong command prompt
+
+react-native run-android
+Nếu suôn sẻ, ứng dụng của bạn sẽ được cài và chạy trên thiết bị thật như hình bên dưới
+
+Cách debug ứng dụng React Native trên thiết bị thật
+
+Trong lần dùng tiếp, nếu bạn thực hiện các thay đổi trong mã nguồn của mình và muốn xem lại thay đổi đó trên thiết bị thì chỉ cần lắc thiết bị của bạn một chút. Bạn sẽ thấy danh sách các tùy chọn sau:
+
+Cách debug ứng dụng React Native trên thiết bị thật
+
+Chỉ cần chọn Reload và bạn sẽ nhận được bản cập nhật ứng dụng với những thay đổi mà bạn vừa thực hiện trong code.
+
+Một số tính năng hữu ích cho debug React Native
+Khi các bạn debug ứng dụng, các bạn sẽ gặp một số option như bên dưới. Mình sẽ giải thích ý nghĩa và sự khác nhau giữa chúng:
+
+Debug JS Remotely: Tùy chọn này cho phép bạn debug ứng dụng react native trong trình duyệt Google Chrome.
+Enable Live Reload: Tùy chọn này cho phép bạn xem lại các thay đổi trên Emulator/Physical Android Device ngay lập tức khi bạn lưu các thay đổi trong mã nguồn của mình. Ứng dụng của bạn sẽ load lại từ màn hình đầu tiên
+Enable Hot Reloading: Tùy chọn này cũng cho phép bạn xem lại các thay đổi ngay lập tức trên Emulator/Physical Android Device nhưng sẽ không load lại từ đầu mà sẽ hiển thị ở màn hình mà bạn đang thay đổi code
+Tất cả chỉ đơn giản vậy thôi.
+
+Lưu ý đây chỉ bước để chạy ứng dụng trên thiết bị thật thôi. Còn để debug source code, bạn cần phải tiến hành trên visual code. Các bạn có thể tham khảo bài viết: cách Debug chương trình React Native trên Visual Code.
+
+
+************************************
+go to C:\Users\Dragonfly\AppData\Local\Android\Sdk\platform-tools
+cmd: adb devices check is devices
+cmd: adb reverse tcp:8081 tcp:8081

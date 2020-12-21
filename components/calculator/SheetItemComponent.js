@@ -1,11 +1,12 @@
 import React from 'react';
 import {StyleSheet, Text, TextInput, View} from "react-native";
 import {Color, DefaultStyle} from "../../utils/Constant";
-import {getSheetItems, updateSheetItem} from "../../databases/Setup";
+import {getSheetItems, updateIsCalculateCustomer, updateSheetItem, updateToTalResultSheet} from "../../databases/Setup";
 import Helpers from "../../utils/Helper";
 
 export default class SheetItemComponent extends React.Component
 {
+    _isSetState = false;
     constructor(props) {
         super(props);
         this.state = {
@@ -14,13 +15,19 @@ export default class SheetItemComponent extends React.Component
             sheetItemFocus: [],
             rowResult: [],
             totalResult: 0,
+            is_calculate: this.props.is_calculate,
         }
 
         this.__updateSheetItem = this.__updateSheetItem.bind(this);
     }
 
     componentDidMount() {
+        this._isSetState = true;
         this.loadSheetItems(this.props.sheet_id);
+    }
+
+    componentWillUnmount() {
+        this._isSetState = false;
     }
 
     loadSheetItems = (sheet_id) => {
@@ -29,7 +36,7 @@ export default class SheetItemComponent extends React.Component
             let sheetItemFocus = [];
             let rowResult = [0, 0, 0, 0, 0];
             let flagIndexRowResult = 0;
-
+            let totalResult = 0;
             sheetItems.map((sheetItem, index) => {
 
                 if(index === 0){
@@ -54,15 +61,18 @@ export default class SheetItemComponent extends React.Component
                 rowResult[flagIndexRowResult] = parseInt(rowResult[flagIndexRowResult]) + parseInt(tempValue);
 
             })
+            totalResult = (rowResult.reduce((a, b) => a + b, 0));
 
-            this.setState({ sheetItems, tempSheetItems: tempItems, sheetItemFocus, rowResult });
+            if(this._isSetState === true){
+                this.setState({ sheetItems, tempSheetItems: tempItems, sheetItemFocus, rowResult, totalResult });
+            }
         }).catch((error) => {
             console.log(error);
         })
     }
 
     __updateSheetItem = (value, iFor) => {
-        let { tempSheetItems, sheetItemFocus, rowResult } = this.state;
+        let { tempSheetItems, sheetItemFocus, rowResult, totalResult, is_calculate } = this.state;
         tempSheetItems[iFor].value = value;
 
         let lengthInput = this.props.qcmc === '0' ? 2 : 3;
@@ -96,9 +106,23 @@ export default class SheetItemComponent extends React.Component
         }
 
         rowResult[this.__detectRowCalculate(iFor)] = result;
+        totalResult = (rowResult.reduce((a, b) => a + b, 0));
 
-        this.setState({ tempSheetItems, sheetItemFocus, rowResult });
+        updateToTalResultSheet(this.props.sheet_id, totalResult).then((result) => { }).catch((error) => {
+            console.log(error);
+        })
 
+        // update is calculate for customer
+        console.log('is_calculate: ', is_calculate);
+        if(is_calculate === 0){
+            updateIsCalculateCustomer(this.props.customer_id, 1).then((result) => { }).catch((error) => {
+                console.log(error);
+            })
+        }
+
+        if(this._isSetState === true){
+            this.setState({ tempSheetItems, sheetItemFocus, rowResult, totalResult, is_calculate: 1 });
+        }
     }
 
     __focusNextField = (nextField) => {
@@ -194,6 +218,11 @@ export default class SheetItemComponent extends React.Component
                 </View>
                 <View style={[styles.row]}>
                     { this.__renderRowResult() }
+                </View>
+                <View style={[styles.row, { width: '100%' }]}>
+                    <View style={[styles.result, { width: '100%' }]}>
+                        <Text style={styles.textResult}>{ this.state.totalResult }</Text>
+                    </View>
                 </View>
             </View>
         )

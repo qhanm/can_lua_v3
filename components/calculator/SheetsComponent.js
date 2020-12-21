@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
 
 export default class SheetsComponent extends React.Component
 {
+    _isSetState = false;
     constructor(props) {
         super(props);
 
@@ -75,13 +76,20 @@ export default class SheetsComponent extends React.Component
     }
 
     componentDidMount() {
+        this._isSetState = true;
         this.loadSheet(this.props.customer_id);
         this.loadSetting(Setting_Quy_Cach_Ma_Can);
     }
 
+    componentWillUnmount() {
+        this._isSetState = false;
+    }
+
     loadSheet = (customer_id) => {
         getSheets(customer_id).then((sheets) => {
-            this.setState({ sheets, countSheet: sheets.length })
+            if(this._isSetState === true){
+                this.setState({ sheets, countSheet: sheets.length })
+            }
         }).catch((error) => {
             console.log(error);
         })
@@ -89,15 +97,16 @@ export default class SheetsComponent extends React.Component
 
     loadSetting = (key) => {
         getSettingByKey(key).then((setting) => {
-            this.setState({ qcmc: setting.value });
+            if(this._isSetState === true){
+                this.setState({ qcmc: setting.value });
+            }
         }).catch((error) => {
             console.log(error);
         })
     }
 
     __renderSheets = () => {
-        const { sheets, qcmc, isCreateNewSheet } = this.state;
-
+        const { sheets, qcmc, isCreateNewSheet, is_calculate } = this.state;
         return sheets.map((sheet, key) => {
             return (
                 <SheetItemComponent
@@ -105,25 +114,23 @@ export default class SheetsComponent extends React.Component
                     sheet_id={ sheet.id }
                     qcmc={ qcmc }
                     sheet_no={ sheet.sheet_no }
+                    is_calculate={ this.props.is_calculate }
+                    customer_id={ this.props.customer_id }
                     handleUpdateIsCreateNewSheet={ this.handleUpdateIsCreateNewSheet }
                 />
             )
         })
     }
 
-    __createNewSheetItem = () => {
-        console.log(this.state.isCreateNewSheet);
-    }
-
     handleUpdateIsCreateNewSheet = (isCreateNewSheet, sheetNo) => {
         if(isCreateNewSheet === true && sheetNo === this.state.countSheet){
             createSheet(this.state.countSheet + 1, this.props.customer_id).then((sheet) => {
-                this.setState(event => ({
-                    sheets: [...event.sheets, sheet]
-                }));
+                if(this._isSetState === true){
+                    this.setState({sheets: this.state.sheets, countSheet: this.state.countSheet + 1});
+                }
+            }).catch((error) => {
+                console.log(error);
             })
-            console.log('You need create new sheet item');
-
         }
     }
 

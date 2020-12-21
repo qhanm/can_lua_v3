@@ -4,7 +4,8 @@ import {Color, Font, DefaultStyle} from "../../utils/Constant";
 import Close from "../icons/Close";
 import {Button} from "react-native-elements";
 import SheetsComponent from "./SheetsComponent";
-import {createSheet, getOneCustomer, updateUnBlockCustomer} from "../../databases/Setup";
+import {createSheet, getOneCustomer, getSheets, updateUnBlockCustomer} from "../../databases/Setup";
+import Helpers from "../../utils/Helper";
 
 const styles = StyleSheet.create({
     container: {
@@ -110,11 +111,14 @@ export default class CalculatorComponent extends React.Component
         super(props);
         this.state = {
             customer: {},
+            sheets: [],
+            tongKhoiLuong: 0
         }
     }
 
     componentDidMount() {
         this.loadCustomer(this.props.customer);
+        this.loadSheet(this.props.customer);
     }
 
     loadCustomer = (customer_id) => {
@@ -123,6 +127,17 @@ export default class CalculatorComponent extends React.Component
         }).catch((error) => {
             console.log(error);
         })
+    }
+
+    loadSheet = (customer_id) => {
+        getSheets(customer_id).then((sheets) => {
+            let tongKhoiLuong = 0;
+
+            sheets.map((sheet) => {
+                tongKhoiLuong = tongKhoiLuong + Helpers.ConvertStringToInt(sheet.result);
+            })
+            this.setState({ sheets, tongKhoiLuong })
+        }).catch((error) => { console.log(error) })
     }
     __handleOnClickButton = () => {
         const { customer } = this.state;
@@ -134,18 +149,19 @@ export default class CalculatorComponent extends React.Component
             })
 
             createSheet(1, customer.id).then((result) => {
-                this.props.navigation.navigate('SheetScreen', { customer_id: customer.id });
+                this.props.navigation.navigate('SheetScreen', { customer_id: customer.id, is_calculate: customer.is_calculate });
             }).catch((error) => {
                 console.log(error);
             })
         }else{
-            this.props.navigation.navigate('SheetScreen', { customer_id: customer.id });
+            this.props.navigation.navigate('SheetScreen', { customer_id: customer.id, is_calculate: customer.is_calculate });
         }
 
     }
 
     render() {
-        const { customer } = this.state;
+        const { customer, sheets, tongKhoiLuong } = this.state;
+        console.log(customer)
         return (
             <SafeAreaView>
                 <ScrollView contentContainerStyle={{ paddingBottom: 200}}>
@@ -189,8 +205,9 @@ export default class CalculatorComponent extends React.Component
                                             <View style={{width: '50%'}}>
                                                 <TextInput
                                                     style={[DefaultStyle.InputNumber, styles.textInput]}
-                                                    placeholder='0'
+                                                    //placeholder='0'
                                                     keyboardType='numeric'
+                                                    value={ this.state.tongKhoiLuong.toString() }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -267,7 +284,7 @@ export default class CalculatorComponent extends React.Component
                                             <View style={{width: '50%'}}>
                                                 <TextInput
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {}]}
-                                                    placeholder='0'
+                                                    value={ Helpers.ConvertStringToInt(customer.gia_mua).toString() }
                                                     keyboardType='numeric'
                                                     placeholderTextColor={Color.Blue}
                                                 />

@@ -7,6 +7,7 @@ import {SessionContext} from "../../context/SessionProvider";
 
 class ListClientComponent extends React.Component
 {
+    _isSetState = false;
     constructor(props){
         super(props);
 
@@ -17,12 +18,18 @@ class ListClientComponent extends React.Component
 
     }
     componentDidMount(): void {
-
+        this._isSetState = true;
         getAllClientGroup().then((realm) => {
-            this.setState({clientGroup: realm});
+            if(this._isSetState){
+                this.setState({clientGroup: realm});
+            }
         }).catch((error) => {
             console.log(error);
         })
+    }
+
+    componentWillUnmount() {
+        this._isSetState = false;
     }
 
     getHeightView = (event) => {
@@ -32,8 +39,9 @@ class ListClientComponent extends React.Component
         if(height > heightWindow){
             height = height - heightWindow;
         }
-
-        this.setState({heightScrollView: height});
+        if(this._isSetState){
+            this.setState({heightScrollView: height});
+        }
     }
 
     __renderAlert = () => {

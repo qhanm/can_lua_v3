@@ -185,6 +185,19 @@ export const updateUnBlockCustomer = (id, isUnBlock) => new Promise((resolve, re
     }).catch((error) => { reject(error) })
 })
 
+export const updateIsCalculateCustomer = (id, isCalculator) => new Promise((resolve, reject) => {
+    Realm.open(databaseOptions).then((realm) => {
+        let customer = realm.objectForPrimaryKey(Schema.Customers, id);
+        if(customer !== undefined)
+        {
+            realm.write(() => {
+                customer.is_calculate = 1;
+            })
+            resolve(true);
+        }
+    }).catch((error) => { reject(error) })
+})
+
 export const createSheet = (sheetNo, customerId) => new Promise((resole, reject) => {
     Realm.open(databaseOptions).then((realm) => {
         let sheet = {
@@ -280,6 +293,16 @@ export const updateSetting = (qcmc, tbb) => new Promise((resolve, reject) => {
     }).catch((error) => {
         reject(error)
     })
+})
+
+export const updateToTalResultSheet = (sheet_id, result) => new Promise((resolve, reject) => {
+    Realm.open(databaseOptions).then((realm) => {
+        let sheet = realm.objectForPrimaryKey(Schema.Sheets, sheet_id);
+        realm.write(() => {
+            sheet.result = result;
+        })
+        resolve(sheet);
+    }).catch((error) => { reject(error) })
 })
 
 export const Setting_Quy_Cach_Ma_Can = 'quy_cach_ma_can';
