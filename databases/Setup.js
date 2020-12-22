@@ -69,7 +69,14 @@ const Sheets = {
     properties: {
         id: 'string',
         sheet_no: 'int',
-        result: 'float',
+        result: {
+            type: 'float',
+            default: 0
+        },
+        totalBao: {
+            type: 'int',
+            default: 0,
+        },
         customer_id: 'string',
     }
 }
@@ -295,11 +302,12 @@ export const updateSetting = (qcmc, tbb) => new Promise((resolve, reject) => {
     })
 })
 
-export const updateToTalResultSheet = (sheet_id, result) => new Promise((resolve, reject) => {
+export const updateToTalResultSheet = (sheet_id, result, totalBao) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
         let sheet = realm.objectForPrimaryKey(Schema.Sheets, sheet_id);
         realm.write(() => {
             sheet.result = result;
+            sheet.totalBao = totalBao;
         })
         resolve(sheet);
     }).catch((error) => { reject(error) })

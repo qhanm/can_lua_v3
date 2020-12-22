@@ -112,7 +112,8 @@ export default class CalculatorComponent extends React.Component
         this.state = {
             customer: {},
             sheets: [],
-            tongKhoiLuong: 0
+            tongKhoiLuong: 0,
+            totalBao: 0
         }
     }
 
@@ -131,8 +132,7 @@ export default class CalculatorComponent extends React.Component
 
     loadSheet = (customer_id) => {
         getSheets(customer_id).then((sheets) => {
-            let tongKhoiLuong = 0;
-
+            let { tongKhoiLuong, totalBao } = this.state;
             sheets.map((sheet) => {
                 tongKhoiLuong = tongKhoiLuong + Helpers.ConvertStringToInt(sheet.result);
             })
@@ -156,6 +156,10 @@ export default class CalculatorComponent extends React.Component
         }else{
             this.props.navigation.navigate('SheetScreen', { customer_id: customer.id, is_calculate: customer.is_calculate });
         }
+
+    }
+
+    __calculateResult = () => {
 
     }
 

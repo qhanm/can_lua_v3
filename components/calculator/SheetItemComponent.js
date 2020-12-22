@@ -96,6 +96,7 @@ export default class SheetItemComponent extends React.Component
 
         // update by row
         let result = 0;
+        let totalBao = 0;
         for(let i = 0; i < 25; i++)
         {
             if(Math.floor(i / 5) === this.__detectRowCalculate(iFor)){
@@ -103,12 +104,21 @@ export default class SheetItemComponent extends React.Component
 
                 result = result + parseInt(tempValue);
             }
+
+            if(
+                !isNaN(tempSheetItems[iFor].value)
+                && !tempSheetItems[iFor].value === ''
+                && !tempSheetItems[iFor].value === null
+                && !tempSheetItems[iFor].value === undefined
+            ){
+                totalBao = totalBao + 1;
+            }
         }
 
         rowResult[this.__detectRowCalculate(iFor)] = result;
         totalResult = (rowResult.reduce((a, b) => a + b, 0));
 
-        updateToTalResultSheet(this.props.sheet_id, totalResult).then((result) => { }).catch((error) => {
+        updateToTalResultSheet(this.props.sheet_id, totalResult, totalBao).then((result) => { }).catch((error) => {
             console.log(error);
         })
 
