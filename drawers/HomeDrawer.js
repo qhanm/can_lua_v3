@@ -46,7 +46,6 @@ class HomeDrawer extends React.Component
     }
 
     render() {
-        console.log(this.state.settings)
         return (
             <Drawer.Navigator drawerContent={ props =>  <SideBarCustom {...props} /> } >
                 <Drawer.Screen

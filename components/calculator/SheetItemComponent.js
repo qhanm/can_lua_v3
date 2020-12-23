@@ -106,10 +106,10 @@ export default class SheetItemComponent extends React.Component
             }
 
             if(
-                !isNaN(tempSheetItems[iFor].value)
-                && !tempSheetItems[iFor].value === ''
-                && !tempSheetItems[iFor].value === null
-                && !tempSheetItems[iFor].value === undefined
+                !isNaN(tempSheetItems[i].value)
+                && !(tempSheetItems[i].value === '')
+                && !(tempSheetItems[i].value === null)
+                && !(tempSheetItems[i].value === undefined)
             ){
                 totalBao = totalBao + 1;
             }
@@ -117,13 +117,11 @@ export default class SheetItemComponent extends React.Component
 
         rowResult[this.__detectRowCalculate(iFor)] = result;
         totalResult = (rowResult.reduce((a, b) => a + b, 0));
-
         updateToTalResultSheet(this.props.sheet_id, totalResult, totalBao).then((result) => { }).catch((error) => {
             console.log(error);
         })
 
         // update is calculate for customer
-        console.log('is_calculate: ', is_calculate);
         if(is_calculate === 0){
             updateIsCalculateCustomer(this.props.customer_id, 1).then((result) => { }).catch((error) => {
                 console.log(error);

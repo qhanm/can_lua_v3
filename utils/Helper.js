@@ -35,6 +35,11 @@ const GetFullDateCurrent = () => {
     return date.getHours() + 'h:' + minute + "' " + day + '-' + month + '-' + date.getFullYear();
 }
 
+const formatCurrency = (n, currency) => {
+    return currency + n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+}
+
+
 const Guid = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
@@ -68,6 +73,7 @@ const Helpers = {
     Guid1: Guid1,
     GetFullDateCurrent: GetFullDateCurrent,
     ConvertStringToInt: ConvertStringToInt,
+    formatCurrency: formatCurrency,
 }
 
 export default Helpers;

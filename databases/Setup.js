@@ -31,7 +31,15 @@ const Customers = {
             type: 'float',
             default: 0,
         },
+        qcmc: {
+            type: 'int',
+            default: 0 // 0: can chan, 1 can le
+        },
         ngay_can: 'string',
+        tbb: {
+            type: 'int',
+            default: 0
+        },
         tong_kl: {
             type: 'float',
             default: 0,
@@ -202,6 +210,21 @@ export const updateIsCalculateCustomer = (id, isCalculator) => new Promise((reso
             })
             resolve(true);
         }
+    }).catch((error) => { reject(error) })
+})
+
+export const updateCustomerByOption = (id, type, value) => new Promise((resolve, reject) => {
+    Realm.open(databaseOptions).then((realm) => {
+        let customer = realm.objectForPrimaryKey(Schema.Customers, id);
+        realm.write(() => {
+            if(type === 'giaMua'){
+                customer.gia_mua = parseFloat(value);
+            }else if(type === 'tbb'){
+                customer.tbb = parseInt(value);
+            }
+
+            resolve(customer);
+        })
     }).catch((error) => { reject(error) })
 })
 

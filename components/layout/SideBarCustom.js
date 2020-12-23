@@ -54,8 +54,6 @@ class SideBarCustom extends React.Component{
     }
 
     render() {
-        console.log(this.state);
-
         return (
             <Grid>
                 <Row size={12} style={styles.header}>
@@ -94,6 +92,7 @@ class SideBarCustom extends React.Component{
                                     keyboardType='numeric'
                                     style={DefaultStyle.InputNumber}
                                     value={ this.state.tbb.toString() }
+                                    onChangeText={(value) => this.setState({ tbb: value })}
                                 />
                             </View>
                             <View>

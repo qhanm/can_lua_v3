@@ -4,7 +4,13 @@ import {Color, Font, DefaultStyle} from "../../utils/Constant";
 import Close from "../icons/Close";
 import {Button} from "react-native-elements";
 import SheetsComponent from "./SheetsComponent";
-import {createSheet, getOneCustomer, getSheets, updateUnBlockCustomer} from "../../databases/Setup";
+import {
+    createSheet,
+    getOneCustomer,
+    getSheets,
+    updateCustomerByOption,
+    updateUnBlockCustomer
+} from "../../databases/Setup";
 import Helpers from "../../utils/Helper";
 
 const styles = StyleSheet.create({
@@ -110,10 +116,18 @@ export default class CalculatorComponent extends React.Component
     constructor(props) {
         super(props);
         this.state = {
-            customer: {},
+            customer: {
+                tbb: 0,
+                qcmc: 0,
+            },
             sheets: [],
             tongKhoiLuong: 0,
-            totalBao: 0
+            totalBao: 0,
+            customerTemp: {
+                truBiBao: 0,
+                quyCachMaCan: 0,
+                giaMua: 0,
+            },
         }
     }
 
@@ -124,7 +138,12 @@ export default class CalculatorComponent extends React.Component
 
     loadCustomer = (customer_id) => {
         getOneCustomer(customer_id).then((customer) => {
-            this.setState({ customer });
+            let customerTemp = {
+                truBiBao: customer.tbb,
+                quyCachMaCan: customer.qcmc,
+                giaMua: customer.gia_mua,
+            }
+            this.setState({ customer, customerTemp });
         }).catch((error) => {
             console.log(error);
         })
@@ -135,8 +154,9 @@ export default class CalculatorComponent extends React.Component
             let { tongKhoiLuong, totalBao } = this.state;
             sheets.map((sheet) => {
                 tongKhoiLuong = tongKhoiLuong + Helpers.ConvertStringToInt(sheet.result);
+                totalBao = totalBao + sheet.totalBao;
             })
-            this.setState({ sheets, tongKhoiLuong })
+            this.setState({ sheets, tongKhoiLuong, totalBao })
         }).catch((error) => { console.log(error) })
     }
     __handleOnClickButton = () => {
@@ -159,13 +179,55 @@ export default class CalculatorComponent extends React.Component
 
     }
 
+    __updateCustomer = (value, type) => {
+        let { customerTemp, customer } = this.state;
+        if(type === 'tbb'){
+            customerTemp.truBiBao = Helpers.ConvertStringToInt(value);
+        }else if(type === 'giaMua'){
+            customerTemp.giaMua = Helpers.ConvertStringToInt(value);
+        }
+        this.setState({ customerTemp })
+
+        if(!isNaN(value) && value !== undefined && value !== ''){
+            updateCustomerByOption(customer.id, type, value).then((customer) => {
+                let customerTemp = {
+                    quyCachMaCan: customer.qcmc,
+                    truBiBao: customer.tbb,
+                    giaMua: customer.gia_mua,
+                }
+                this.setState({ customer, customerTemp });
+            }).catch((error) => { console.log(error) })
+        }
+    }
+
     __calculateResult = () => {
 
     }
 
+    __calculateKLCL = () => {
+        let { customer, tongKhoiLuong, totalBao } = this.state;
+        return (parseFloat(this.__calculateTotalResult(tongKhoiLuong, customer.qcmc )) - parseFloat(this.__calculateKLBB(totalBao, customer.tbb))).toFixed(1).toString();
+    }
+    __calculateKLBB = (slb, tbb) => {
+        return parseFloat(slb / tbb).toFixed(1).toString();
+    }
+    __calculateTotalResult = (total, cqcm) => {
+        if(cqcm === 0){
+            return total.toString();
+        }
+
+        return (total / 10).toString();
+    }
+
+    __calculateTT = () => {
+        let { customer } = this.state;
+        let tt = (parseFloat(this.__calculateKLCL())) * customer.gia_mua;
+        return Helpers.formatCurrency(tt, '');
+    }
+
     render() {
-        const { customer, sheets, tongKhoiLuong } = this.state;
-        console.log(customer)
+        const { customer, sheets, tongKhoiLuong, totalBao, customerTemp } = this.state;
+
         return (
             <SafeAreaView>
                 <ScrollView contentContainerStyle={{ paddingBottom: 200}}>
@@ -211,7 +273,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput]}
                                                     //placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ this.state.tongKhoiLuong.toString() }
+                                                    value={ this.__calculateTotalResult(tongKhoiLuong, customer.qcmc) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -231,6 +293,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
                                                     placeholder='0'
                                                     keyboardType='numeric'
+                                                    value={ totalBao.toString() }
                                                     placeholderTextColor={Color.Red}
                                                 />
                                             </View>
@@ -241,6 +304,27 @@ export default class CalculatorComponent extends React.Component
                                             </View>
                                         </View>
 
+                                        {/* Tru bi bao */}
+                                        <View style={[styles.item]}>
+                                            <View style={{width: '30%'}}>
+                                                <Text style={[styles.general, styles.leftItem, {}]}>Tru Bi Bao</Text>
+                                            </View>
+                                            <View style={{width: '50%'}}>
+                                                <TextInput
+                                                    style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
+                                                    placeholder='0'
+                                                    keyboardType='numeric'
+                                                    value={ customerTemp.truBiBao.toString() }
+                                                    placeholderTextColor={Color.Red}
+                                                    onChangeText={(value) => this.__updateCustomer(value, 'tbb')}
+                                                />
+                                            </View>
+                                            <View style={{width: '20%'}}>
+                                                <Text style={[styles.general, styles.rightItem]}>
+                                                    Cái
+                                                </Text>
+                                            </View>
+                                        </View>
                                         {/*KL Bao Bi*/}
                                         <View style={[styles.item]}>
                                             <View style={{width: '30%'}}>
@@ -251,6 +335,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
                                                     placeholder='0'
                                                     keyboardType='numeric'
+                                                    value={ this.__calculateKLBB(totalBao, customer.tbb) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -271,6 +356,7 @@ export default class CalculatorComponent extends React.Component
                                                     placeholder='0'
                                                     keyboardType='numeric'
                                                     editable={false}
+                                                    value={ this.__calculateKLCL() }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -288,8 +374,9 @@ export default class CalculatorComponent extends React.Component
                                             <View style={{width: '50%'}}>
                                                 <TextInput
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {}]}
-                                                    value={ Helpers.ConvertStringToInt(customer.gia_mua).toString() }
+                                                    value={ Helpers.ConvertStringToInt(customerTemp.giaMua).toString() }
                                                     keyboardType='numeric'
+                                                    onChangeText={(value) => this.__updateCustomer(value, 'giaMua')}
                                                     placeholderTextColor={Color.Blue}
                                                 />
                                             </View>
@@ -312,6 +399,7 @@ export default class CalculatorComponent extends React.Component
                                                     keyboardType='numeric'
                                                     placeholderTextColor={Color.Red}
                                                     editable={false}
+                                                    value={ this.__calculateTT() }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>

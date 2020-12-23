@@ -3,7 +3,13 @@ import {View, Text, StyleSheet, TextInput} from "react-native";
 import {Color, DefaultStyle} from "../../utils/Constant";
 import { Button } from 'react-native-elements';
 import {IconCustom} from "../layout/IconCustom";
-import {insertCustomer} from "../../databases/Setup";
+import {
+    getAllSettings,
+    getSettingByKey,
+    insertCustomer,
+    Setting_Quy_Cach_Ma_Can,
+    Setting_Tru_Bi_Bao
+} from "../../databases/Setup";
 import Helpers from "../../utils/Helper";
 
 const styles = StyleSheet.create({
@@ -47,13 +53,36 @@ export default class AddCustomerComponent extends Component
             gia_mua: 0,
             errName: false,
             errTenGiong: false,
+            tbb: 0,
+            qcmc: 0,
         }
+    }
 
-        console.log(this.props.client_id);
+    componentDidMount() {
+        this.loadSetting();
+    }
+
+    loadSetting  = () => {
+        getAllSettings().then((settings) => {
+            let { qcmc, tbb } = this.state;
+            settings.map((setting) => {
+                if(setting.key === Setting_Quy_Cach_Ma_Can){
+                    qcmc = parseInt(setting.value);
+                }
+
+                if(setting.key === Setting_Tru_Bi_Bao){
+                    tbb = parseInt(setting.value);
+                }
+            })
+
+            this.setState({
+                qcmc, tbb
+            })
+        })
     }
     __handleOnSave = () => {
 
-        const { name, ten_giong, gia_mua } = this.state;
+        const { name, ten_giong, gia_mua, tbb, qcmc } = this.state;
 
         let { errName, errTenGiong } = this.state;
 
@@ -73,10 +102,12 @@ export default class AddCustomerComponent extends Component
         let customer = {
             id: Helpers.Guid1('customer'),
             client_id: this.props.client_id,
-            ten: this.state.name,
-            ten_giong: this.state.ten_giong,
-            gia_mua: parseFloat(this.state.gia_mua),
+            ten: name,
+            ten_giong: ten_giong,
+            gia_mua: parseFloat(gia_mua),
             ngay_can: Helpers.GetFullDateCurrent(),
+            tbb: tbb,
+            qcmc: qcmc,
             //tong_kl: 0,
             //slb: 0,
             //klbb: 0,
