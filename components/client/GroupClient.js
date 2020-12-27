@@ -1,11 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import {Color, DefaultStyle, Font, PageConstant} from "../../utils/Constant";
 import { Icon } from 'react-native-elements'
 import {sub} from "react-native-reanimated";
 import {SessionContext} from "../../context/SessionProvider";
-import {getClientByGroup} from "../../databases/Setup";
+import {deleteClient, getClientByGroup} from "../../databases/Setup";
 import Helpers from "../../utils/Helper";
+import {ToastContext} from "react-native-styled-toast";
 
 const styles = StyleSheet.create({
     container: {},
@@ -101,7 +102,11 @@ class GroupClient extends React.Component
                     }}
                 >
                     <View onLayout={(event) => { this.getWidthIconDelete(event) }}>
-                        <Icon name='delete' color={Color.White} style={styles.iconDelete}/>
+                        <TouchableOpacity
+                            onPress={() => { console.log('on delete ') }}
+                        >
+                            <Icon name='delete' color={Color.White} style={styles.iconDelete}/>
+                        </TouchableOpacity>
                     </View>
                     <TouchableOpacity
                         onPress={() => { this.__onPressClient(sessionContext, this.props.navigation) }}
@@ -127,6 +132,15 @@ class GroupClient extends React.Component
         return clientArr;
     }
 
+    __handleDeleteClient = (toast, client_id) => {
+        deleteClient(client_id).then((result) => {
+            return toast(Helpers.ToastSuccess('Xóa thành công !'));
+        }).catch((error) => {
+            return toast(Helpers.ToastError(error.toString()));
+
+        })
+    }
+
     render() {
         const { date } = this.props.group;
 
@@ -134,46 +148,66 @@ class GroupClient extends React.Component
             <SessionContext.Consumer>
                 {
                     sessionContext =>
-                        <View style={styles.container}>
-                            <View style={styles.header}>
-                                <Icon name='today' color={Color.Blue}/>
-                                <Text style={[styles.textHeader, styles.headerBase]}>{ date }</Text>
-                            </View>
-                            <View>
-                                {
-                                    this.state.clients.map((cc, key) => {
-                                        return (
-                                            <View style={[DefaultStyle.Card, styles.row]} onLayout={(event) => {this.getHeightView(event)}} key={key}>
-                                                <View
-                                                    onLayout={(event) => { this.getWidthIconDelete(event) }}
-                                                >
-                                                    <TouchableOpacity>
-                                                        <Icon
-                                                            name='delete'
-                                                            color={Color.White}
-                                                            style={styles.iconDelete}
-                                                        />
-                                                    </TouchableOpacity>
-                                                </View>
-                                                <TouchableOpacity
-                                                >
-                                                    <View style={[styles.rowRightContent, {width: this.state.widthViewClientRight}]}>
-                                                        <Text style={{marginLeft: 10, fontFamily: Font}}>{ cc.name }</Text>
-                                                        <Text style={{marginRight: 8}}>
-                                                            <Icon
-                                                                name='chevron-right'
-                                                                type='font-awesome'
-                                                                color={Color.Red}
-                                                                onPress={() => this.props.navigation.navigate('CustomerScreen', { client_id: cc.id })} />
-                                                        </Text>
-                                                    </View>
-                                                </TouchableOpacity>
-                                            </View>
-                                        )
-                                    })
-                                }
-                            </View>
-                        </View>
+                       <ToastContext.Consumer>
+                           {({ toast }) => {
+                               return  <View style={styles.container}>
+                                   <View style={styles.header}>
+                                       <Icon name='today' color={Color.Blue}/>
+                                       <Text style={[styles.textHeader, styles.headerBase]}>{ date }</Text>
+                                   </View>
+                                   <View>
+                                       {
+                                           this.state.clients.map((cc, key) => {
+                                               return (
+                                                   <View style={[DefaultStyle.Card, styles.row]} onLayout={(event) => {this.getHeightView(event)}} key={key}>
+                                                       <View
+                                                           onLayout={(event) => { this.getWidthIconDelete(event) }}
+                                                       >
+                                                           <TouchableOpacity
+                                                               onPress={() => {
+                                                                   Alert.alert(
+                                                                       "Thông báo",
+                                                                       `Bạn có chắc muốn xóa bảng tính "${ cc.name }" ?`,
+                                                                       [
+                                                                           {
+                                                                               text: "Hủy",
+                                                                               onPress: () => console.log("Cancel Pressed"),
+                                                                               style: "cancel"
+                                                                           },
+                                                                           { text: "Xóa", onPress: () => this.__handleDeleteClient(toast, cc.id) }
+                                                                       ],
+                                                                       { cancelable: false }
+                                                                   );
+                                                               }}
+                                                           >
+                                                               <Icon
+                                                                   name='delete'
+                                                                   color={Color.White}
+                                                                   style={styles.iconDelete}
+                                                               />
+                                                           </TouchableOpacity>
+                                                       </View>
+                                                       <TouchableOpacity
+                                                       >
+                                                           <View style={[styles.rowRightContent, {width: this.state.widthViewClientRight}]}>
+                                                               <Text style={{marginLeft: 10, fontFamily: Font}}>{ cc.name }</Text>
+                                                               <Text style={{marginRight: 8}}>
+                                                                   <Icon
+                                                                       name='chevron-right'
+                                                                       type='font-awesome'
+                                                                       color={Color.Red}
+                                                                       onPress={() => this.props.navigation.navigate('CustomerScreen', { client_id: cc.id, client_name: cc.name })} />
+                                                               </Text>
+                                                           </View>
+                                                       </TouchableOpacity>
+                                                   </View>
+                                               )
+                                           })
+                                       }
+                                   </View>
+                               </View>
+                           }}
+                       </ToastContext.Consumer>
                 }
             </SessionContext.Consumer>
         )

@@ -66,6 +66,51 @@ const ConvertStringToInt = (value) => {
     return result;
 }
 
+const ToastSuccess = (message) => {
+    return {
+        message: message,
+        toastStyles: {
+            bg: '#2288dd',
+            borderRadius: 4
+        },
+        color: 'white',
+        iconColor: 'white',
+        iconFamily: 'FontAwesome',
+        iconName: 'info',
+        closeButtonStyles: {
+            px: 4,
+            bg: 'darkgrey',
+            borderRadius: 4
+        },
+        closeIconFamily: 'FontAwesome',
+        closeIconName: 'close',
+        closeIconColor: 'white',
+        hideAccent: true
+    }
+}
+
+const ToastError = (message) => {
+    return {
+        message: message,
+        toastStyles: {
+            bg: '#da190b',
+            borderRadius: 4
+        },
+        color: 'white',
+        iconColor: 'white',
+        iconFamily: 'FontAwesome',
+        iconName: 'bug',
+        closeButtonStyles: {
+            px: 4,
+            bg: 'darkgrey',
+            borderRadius: 4
+        },
+        closeIconFamily: 'FontAwesome',
+        closeIconName: 'close',
+        closeIconColor: 'white',
+        hideAccent: true
+    }
+}
 
 const Helpers = {
     GetDateCurrent: GetDateCurrent,
@@ -74,6 +119,8 @@ const Helpers = {
     GetFullDateCurrent: GetFullDateCurrent,
     ConvertStringToInt: ConvertStringToInt,
     formatCurrency: formatCurrency,
+    ToastSuccess: ToastSuccess,
+    ToastError: ToastError,
 }
 
 export default Helpers;

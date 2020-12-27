@@ -150,18 +150,27 @@ export default class SheetItemComponent extends React.Component
         {
             for(let i = (iFor * 5); i < (iFor * 5) + 5; i++)
             {
+                let customStyle;
+
+                let min = this.props.qcmc === 0 ? 40 : 400;
+                let max = this.props.qcmc === 0 ? 80 : 800;
+
+                if((Helpers.ConvertStringToInt(tempSheetItems[i].value) >= max || Helpers.ConvertStringToInt(tempSheetItems[i].value) <= min) && tempSheetItems[i].value !== ''){
+                    customStyle = [DefaultStyle.InputNumber, styles.textInputRed];
+                }else{
+                    customStyle = [DefaultStyle.InputNumber, styles.textInput];
+                }
+
                 content[i] = (
                     <View style={[styles.rowItem]} key={ 'box_' + i }>
                         <TextInput
-                            style={[DefaultStyle.InputNumber, styles.textInput]}
+                            style={customStyle}
                             keyboardType='numeric'
                             value={tempSheetItems[i].value}
                             autoFocus = { this.state.sheetItemFocus[i].autoFocus }
                             // returnKeyType = {"next" + i}
                             ref = {"next" + i}
-                            //blurOnSubmit={false}
                             //onSubmitEditing={() => this.__focusNextField(i)}
-                            //onChangeText={(text) => { this.__updateSheetItem(text, i) }}
                             //blurOnSubmit={false}
                             onChangeText={(val) => {
                                 this.__updateSheetItem(val, i)
@@ -169,6 +178,7 @@ export default class SheetItemComponent extends React.Component
                         />
                     </View>
                 )
+
             }
         }
         return content;
@@ -237,7 +247,7 @@ export default class SheetItemComponent extends React.Component
     }
 }
 
-const styles = StyleSheet.create({
+let styles = StyleSheet.create({
     container: {
         flexDirection: 'column',
         alignItems: 'center',
@@ -292,6 +302,15 @@ const styles = StyleSheet.create({
         height: 40,
         fontSize: 20,
         backgroundColor: Color.Sliver3,
+        color: Color.Black,
+        fontWeight: 'bold',
+    },
+    textInputRed: {
+        width: 60,
+        textAlign: 'center',
+        height: 40,
+        fontSize: 20,
+        backgroundColor: Color.Red,
         color: Color.Black,
         fontWeight: 'bold',
     },

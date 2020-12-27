@@ -1,8 +1,6 @@
 import React from 'react';
 import {View, Text, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native';
-import HeaderCustom from "../components/layout/HeaderCustom";
 import ListCustomer from "../components/customer/ListCustomer";
-
 import {Header, Icon} from "react-native-elements";
 import {Color} from "../utils/Constant";
 
@@ -21,17 +19,26 @@ class CustomerScreen extends React.Component
     constructor(props) {
         super(props);
         let client_id = undefined;
+        let client_name = undefined;
         if(this.props.route.params !== undefined)
         {
             client_id = this.props.route.params.client_id;
+            client_name = this.props.route.params.client_name;
         }
 
 
         this.state = {
             client_id: client_id,
+            client_name: client_name,
         }
+
+        console.log('customer componentDidMount zz')
     }
 
+    componentDidMount() {
+
+
+    }
 
 
     __handleClickBackToHome = () => {
@@ -56,7 +63,7 @@ class CustomerScreen extends React.Component
                         />
                     }
                     centerComponent={
-                        <Text style={{color: Color.White, fontSize: 20}}>Customer Screen</Text>
+                        <Text style={{color: Color.White, fontSize: 20}}>NHÓM: { this.state.client_name }</Text>
                     }
 
                     rightComponent={

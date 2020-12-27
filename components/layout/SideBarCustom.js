@@ -5,8 +5,9 @@ import { Col, Row, Grid } from "react-native-easy-grid";
 import { Color, Font, DefaultStyle } from '../../utils/Constant';
 import IconCustom from '../icons';
 import { Button } from 'react-native-elements';
-import { DrawerActions } from '@react-navigation/native';
 import {getAllSettings, Setting_Quy_Cach_Ma_Can, Setting_Tru_Bi_Bao, updateSetting} from "../../databases/Setup";
+import {ToastContext} from "react-native-styled-toast";
+import Helpers from "../../utils/Helper";
 
 class SideBarCustom extends React.Component{
     constructor(props) {
@@ -15,6 +16,7 @@ class SideBarCustom extends React.Component{
         this.state = {
             qcmc: '',
             tbb: '',
+            isShowToast: true,
         }
     }
 
@@ -26,7 +28,6 @@ class SideBarCustom extends React.Component{
         getAllSettings().then((settings) => {
             let qcmc = '';
             let tbb = '';
-            console.log('Settings: ', settings)
             settings.map((setting) => {
                 if(setting.key === Setting_Quy_Cach_Ma_Can){
                     qcmc = setting.value;
@@ -43,78 +44,82 @@ class SideBarCustom extends React.Component{
         })
     }
 
-    __handleOnSave = () => {
+    __handleOnSave = (toast) => {
         let { qcmc, tbb } = this.state;
         updateSetting(qcmc.toString(), tbb.toString()).then((result) => {
-            // show alert update success
-            // to do ...
+            return toast(Helpers.ToastSuccess('Cập nhật thông tin thành công'));
         }).catch((error) => {
-            console.log(error);
+            return toast(Helpers.ToastError(error.toString()));
         })
     }
 
     render() {
         return (
-            <Grid>
-                <Row size={12} style={styles.header}>
-                    <View style={[styles.headerView]}>
-                        <Text style={[styles.headerTextLeft, styles.headerText]}>CÂN LÚA</Text>
-                        <TouchableOpacity
-                            style={styles.headerTextRight}
-                            onPress={() => { this.props.navigation.closeDrawer() }}
-                        >
-                            <IconCustom.Close />
-                        </TouchableOpacity>
-                    </View>
-                </Row>
-                <Row size={76} style={styles.body}>
-                    <View style={styles.container}>
-                        <View>
-                            <View style={styles.bodyHeader}>
-                                <Text style={styles.textHeaderBold}>Quy cách mã cân</Text>
-                                <View style={styles.pickerView}>
-                                    <Picker
-                                        style={styles.picker}
-                                        selectedValue={ this.state.qcmc }
-                                        onValueChange={(e) => { this.setState({ qcmc: e }) }}
-                                    >
-                                        <Picker.Item label="Khối lượng có phần lẽ" value="1" />
-                                        <Picker.Item label="Khối lượng chẵng" value="0" />
-                                    </Picker>
-                                </View>
-                            </View>
-                            <View>
-                                <Text style={{color: Color.Silver, marginTop: 5, paddingRight: 5, paddingLeft: 5}}>"Khối lượng chẵn" (VD: 50kg, 51kg, 52kg, ...) không quá 99kg. "Khối lượng có phần lẽ" (VD: 50.2kg, 51.4kg, ...) không quá 99,9kg. (Chỉ có hiệu lực kể từ khi thực hiện thay đổi trở về sau)</Text>
-                            </View>
-                            <View>
-                                <Text style={styles.textHeaderBold}>Trừ bì bao</Text>
-                                <TextInput
-                                    keyboardType='numeric'
-                                    style={DefaultStyle.InputNumber}
-                                    value={ this.state.tbb.toString() }
-                                    onChangeText={(value) => this.setState({ tbb: value })}
-                                />
-                            </View>
-                            <View>
-                                <Text style={{color: Color.Silver, marginTop: 5, paddingRight: 5, paddingLeft: 5}}>
-                                    Số lượng bao trên 1kg, mặt đinh là 8 cái/1kg. Nhập vào 0 nếu không muốn trừ bì bao. (Chỉ có hiệu lực kể từ khi thực hiện thay đổi trở về sau).
-                                </Text>
-                            </View>
-                            <View style={{marginTop: 15}}>
-                                <Button
-                                    title="Kích hoạt"
-                                    onPress={() => { this.__handleOnSave() }}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                </Row>
-                <Row size={12} style={[styles.body, styles.rowVersion]}>
-                    <View style={{width: '100%'}}>
-                        <Text style={styles.textVersion}>Phiên bản v1.0.0</Text>
-                    </View>
-                </Row>
-            </Grid>
+           <ToastContext.Consumer>
+               {({ toast }) => {
+                   return <Grid>
+                       <Row size={12} style={styles.header}>
+                           <View style={[styles.headerView]}>
+                               <Text style={[styles.headerTextLeft, styles.headerText]}>CÂN LÚA</Text>
+                               <TouchableOpacity
+                                   style={styles.headerTextRight}
+                                   onPress={() => { this.props.navigation.closeDrawer() }}
+                               >
+                                   <IconCustom.Close />
+                               </TouchableOpacity>
+                           </View>
+                       </Row>
+                       <Row size={76} style={styles.body}>
+                           <View style={styles.container}>
+                               <View>
+                                   <View style={styles.bodyHeader}>
+                                       <Text style={styles.textHeaderBold}>Quy cách mã cân</Text>
+                                       <View style={styles.pickerView}>
+                                           <Picker
+                                               style={styles.picker}
+                                               selectedValue={ this.state.qcmc }
+                                               onValueChange={(e) => { this.setState({ qcmc: e }) }}
+                                           >
+                                               <Picker.Item label="Khối lượng có phần lẽ" value="1" />
+                                               <Picker.Item label="Khối lượng chẵng" value="0" />
+                                           </Picker>
+                                       </View>
+                                   </View>
+                                   <View>
+                                       <Text style={{color: Color.Silver, marginTop: 5, paddingRight: 5, paddingLeft: 5}}>"Khối lượng chẵn" (VD: 50kg, 51kg, 52kg, ...) không quá 99kg. "Khối lượng có phần lẽ" (VD: 50.2kg, 51.4kg, ...) không quá 99,9kg. (Chỉ có hiệu lực kể từ khi thực hiện thay đổi trở về sau)</Text>
+                                   </View>
+                                   <View>
+                                       <Text style={styles.textHeaderBold}>Trừ bì bao</Text>
+                                       <TextInput
+                                           keyboardType='numeric'
+                                           style={DefaultStyle.InputNumber}
+                                           value={ this.state.tbb.toString() }
+                                           onChangeText={(value) => this.setState({ tbb: value })}
+                                       />
+                                   </View>
+                                   <View>
+                                       <Text style={{color: Color.Silver, marginTop: 5, paddingRight: 5, paddingLeft: 5}}>
+                                           Số lượng bao trên 1kg, mặt đinh là 8 cái/1kg. Nhập vào 0 nếu không muốn trừ bì bao. (Chỉ có hiệu lực kể từ khi thực hiện thay đổi trở về sau).
+                                       </Text>
+                                   </View>
+                                   <View style={{marginTop: 15}}>
+                                       <Button
+                                           title="Kích hoạt"
+                                           onPress={() => { this.__handleOnSave(toast) }}
+                                       />
+                                   </View>
+                               </View>
+                           </View>
+                       </Row>
+                       <Row size={12} style={[styles.body, styles.rowVersion]}>
+                           <View style={{width: '100%'}}>
+                               <Text style={styles.textVersion}>Phiên bản v1.0.0</Text>
+                           </View>
+                       </Row>
+                   </Grid>
+               }}
+
+           </ToastContext.Consumer>
         )
     }
 }

@@ -187,17 +187,6 @@ export default class CalculatorComponent extends React.Component
             customerTemp.giaMua = Helpers.ConvertStringToInt(value);
         }
         this.setState({ customerTemp })
-
-        if(!isNaN(value) && value !== undefined && value !== ''){
-            updateCustomerByOption(customer.id, type, value).then((customer) => {
-                let customerTemp = {
-                    quyCachMaCan: customer.qcmc,
-                    truBiBao: customer.tbb,
-                    giaMua: customer.gia_mua,
-                }
-                this.setState({ customer, customerTemp });
-            }).catch((error) => { console.log(error) })
-        }
     }
 
     __calculateResult = () => {
@@ -225,9 +214,24 @@ export default class CalculatorComponent extends React.Component
         return Helpers.formatCurrency(tt, '');
     }
 
+    __handleOnSubmitUpdateTBB = (event, type) => {
+        let { customer } = this.state;
+        let value = event.nativeEvent.text;
+        if(!isNaN(value) && value !== undefined && value !== ''){
+            updateCustomerByOption(customer.id, type, value).then((customer) => {
+                let customerTemp = {
+                    quyCachMaCan: customer.qcmc,
+                    truBiBao: customer.tbb,
+                    giaMua: customer.gia_mua,
+                }
+                this.setState({ customer, customerTemp });
+            }).catch((error) => { console.log(error) })
+        }
+    }
+
     render() {
         const { customer, sheets, tongKhoiLuong, totalBao, customerTemp } = this.state;
-
+        //console.log(customer);
         return (
             <SafeAreaView>
                 <ScrollView contentContainerStyle={{ paddingBottom: 200}}>
@@ -317,6 +321,7 @@ export default class CalculatorComponent extends React.Component
                                                     value={ customerTemp.truBiBao.toString() }
                                                     placeholderTextColor={Color.Red}
                                                     onChangeText={(value) => this.__updateCustomer(value, 'tbb')}
+                                                    onSubmitEditing={(event) => this.__handleOnSubmitUpdateTBB(event, 'tbb')}
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -378,6 +383,8 @@ export default class CalculatorComponent extends React.Component
                                                     keyboardType='numeric'
                                                     onChangeText={(value) => this.__updateCustomer(value, 'giaMua')}
                                                     placeholderTextColor={Color.Blue}
+                                                    onSubmitEditing={(event) => this.__handleOnSubmitUpdateTBB(event, 'giaMua')}
+
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, SafeAreaView, ToastAndroid  } from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Dimensions, SafeAreaView, ToastAndroid, RefreshControl} from 'react-native';
 import GroupClient from "./GroupClient";
 import {DefaultStyle} from "../../utils/Constant";
 import {getAllClientGroup} from "../../databases/Setup";
@@ -14,6 +14,7 @@ class ListClientComponent extends React.Component
         this.state = {
             heightScrollView: 10,
             clientGroup: [],
+            isPullRefresh: false,
         }
 
     }
@@ -48,6 +49,16 @@ class ListClientComponent extends React.Component
         ToastAndroid.showWithGravity('Thêm nhóm mới thành công',  ToastAndroid.LONG,ToastAndroid.BOTTOM)
     }
 
+    __onRefresh = () => {
+        getAllClientGroup().then((realm) => {
+            if(this._isSetState){
+                this.setState({clientGroup: realm});
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
     __renderClientGroup = (sessionContext) => {
         return this.state.clientGroup.map((group, key) => {
             return (
@@ -68,8 +79,16 @@ class ListClientComponent extends React.Component
                     sessionContext => (
                         <View>
                             <SafeAreaView>
-                                <ScrollView contentContainerStyle={{paddingBottom: 200}}>
-                                    <View style={styles.container} onLayout={(event) => { this.getHeightView(event) }}>
+                                <ScrollView
+                                    contentContainerStyle={{paddingBottom: 200}}
+                                    refreshControl={
+                                        <RefreshControl refreshing={false} onRefresh={() => { this.__onRefresh() }} />
+                                    }
+                                >
+                                    <View
+                                        style={styles.container}
+                                        onLayout={(event) => { this.getHeightView(event) }}
+                                    >
                                         {
                                             this.__renderClientGroup(sessionContext)
                                         }

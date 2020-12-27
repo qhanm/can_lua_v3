@@ -155,6 +155,58 @@ export const insertClient = (name) => new Promise((resolve, reject) => {
     })
 })
 
+export const deleteClient = (client_id) => new Promise((resolve, reject) => {
+    Realm.open(databaseOptions).then((realm) => {
+        realm.write(() => {
+            let client = realm.objectForPrimaryKey(Schema.Clients, client_id);
+
+            let customers = realm.objects(Schema.Customers).filtered('client_id = $0', client_id);
+
+            if(customers !== undefined && Array.isArray(customers) ){
+                customers.map((customer) => {
+                    let sheets = realm.objects(Schema.Sheets).filtered('customer_id = $0', customer.id);
+
+                    if(sheets !== undefined && Array.isArray(sheets)){
+                        sheets.map((sheet) => {
+                            let sheetItems = realm.objects(Schema.SheetItems).filtered('sheet_id = $0', sheet.id);
+                            realm.delete(sheetItems);
+                        })
+                    }realm.delete(sheets);
+                })
+            }
+
+            realm.delete(customers);
+            if(client !== undefined){
+                realm.delete(client);
+            }
+
+            resolve(true);
+        })
+    }).catch((error) => { reject(error) })
+})
+
+export const  deleteCustomer = (customer_id) => new Promise((resolve, reject) => {
+    Realm.open(databaseOptions).then((realm) => {
+        realm.write(() => {
+            let customer = realm.objectForPrimaryKey(Schema.Customers, customer_id);
+
+            if(customer !== undefined){
+                let sheets = realm.objects(Schema.Sheets).filtered('customer_id = $0', customer.id);
+                if(sheets !== undefined && Array.isArray(sheets)){
+                    sheets.map((sheet) => {
+                        let sheetItems = realm.objects(Schema.SheetItems).filtered('sheet_id = $0', sheet.id);
+
+                        realm.delete(sheetItems);
+                    })
+                }
+                realm.delete(sheets);
+            }
+            realm.delete(customer);
+            resolve(true);
+        })
+    }).catch((error) => { reject(error) })
+})
+
 export const getClientByGroup = (group) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
         const clients = realm.objects(Schema.Clients).filtered('date = $0', group);
