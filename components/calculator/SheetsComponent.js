@@ -107,6 +107,7 @@ export default class SheetsComponent extends React.Component
 
     __renderSheets = () => {
         const { sheets, qcmc, isCreateNewSheet, is_calculate } = this.state;
+
         return sheets.map((sheet, key) => {
             return (
                 <SheetItemComponent

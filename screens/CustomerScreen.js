@@ -31,8 +31,6 @@ class CustomerScreen extends React.Component
             client_id: client_id,
             client_name: client_name,
         }
-
-        console.log('customer componentDidMount zz')
     }
 
     componentDidMount() {

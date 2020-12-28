@@ -1,7 +1,7 @@
 import React from 'react';
 import {ScrollView, View, SafeAreaView, TouchableOpacity, Text, Alert, StyleSheet} from "react-native";
 import CustomerComponent from "./CustomerComponent";
-import {deleteCustomer, getCustomerByClient} from "../../databases/Setup";
+import {deleteCustomer, getCustomerByClient, getSheets} from "../../databases/Setup";
 import {SessionContext} from "../../context/SessionProvider";
 import Helpers from "../../utils/Helper";
 import {Color, DefaultStyle, Font} from "../../utils/Constant";
@@ -70,6 +70,7 @@ class ListCustomer extends React.Component
     render() {
 
         const { navigation } = this.props;
+       console.log(this.state.customers);
 
         return (
             <SessionContext.Consumer>
@@ -125,7 +126,7 @@ class ListCustomer extends React.Component
                                                                           color={Color.Blue}
                                                                     />
                                                                     <Text style={[styles.text, {marginLeft: 10, fontSize: 15}]}>
-                                                                        KL: { customer.tong_kl } Kg x { customer.gia_mua } VND
+                                                                        KL: { customer.klcl } Kg x { customer.gia_mua } VND
                                                                     </Text>
                                                                 </View>
                                                             </View>
@@ -137,7 +138,7 @@ class ListCustomer extends React.Component
                                                                         color={Color.Red}
                                                                     />
                                                                     <Text style={[styles.text, {marginLeft: 10, fontSize: 15}]}>
-                                                                        TT: { customer.tt } VND
+                                                                        TT: { Helpers.formatCurrency(customer.tt, '') } VND
                                                                     </Text>
                                                                 </View>
                                                             </View>

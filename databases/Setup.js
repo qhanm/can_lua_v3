@@ -216,8 +216,43 @@ export const getClientByGroup = (group) => new Promise((resolve, reject) => {
 
 export const getCustomerByClient = (client_id) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
-        const customers = realm.objects(Schema.Customers).filtered('client_id = $0', client_id);
-        resolve(customers);
+        realm.write(() => {
+            let customers = realm.objects(Schema.Customers).filtered('client_id = $0', client_id);
+
+            if(customers !== undefined)
+            {
+                customers.map((customer, index) => {
+                    if(customer.is_calculate === 1)
+                    {
+                        let sheets = realm.objects(Schema.Sheets).filtered('customer_id = $0', customer.id);
+                        let tong_kl = 0;
+                        let slb = 0;
+
+                        sheets.map((sheet) => {
+                            tong_kl = tong_kl + Helpers.ConvertStringToInt(sheet.result);
+                            slb = slb + sheet.totalBao;
+                        })
+
+                        customers[index].slb = slb;
+
+                        // can chang
+                        if(customers[index].qcmc === 0){
+                            customers[index].tong_kl = tong_kl;
+                        }
+                        // can le
+                        else{
+                            customers[index].tong_kl = parseFloat(tong_kl / 10);
+                        }
+                        customers[index].klbb = parseFloat(customers[index].slb / customers[index].tbb);
+                        customers[index].klcl = parseFloat(customers[index].tong_kl - customers[index].klbb);
+                        customers[index].tt = customers[index].gia_mua * customers[index].klcl;
+                        customer.is_calculate = 0;
+                    }
+
+                })
+            }
+            resolve(customers);
+        })
     }).catch((error) => { reject(error) })
 })
 
