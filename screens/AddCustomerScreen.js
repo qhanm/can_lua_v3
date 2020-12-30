@@ -42,7 +42,7 @@ export default class AddCustomerScreen extends Component
                         />
                     }
                     centerComponent={
-                        <Text style={{color: Color.White, fontSize: 20}}>Customer Screen</Text>
+                        <Text style={{color: Color.White, fontSize: 20}}>Thêm Nông Dân</Text>
                     }
                 />
                 <AddCustomerComponent

@@ -20,8 +20,10 @@ export default class CalculatorScreen extends React.Component
     constructor(props) {
         super(props);
         const customer = this.props.route.params.customer_id;
+        const customer_name = this.props.route.params.customer_name;
         this.state = {
             customer: customer,
+            customer_name: customer_name,
         }
     }
 
@@ -43,7 +45,7 @@ export default class CalculatorScreen extends React.Component
                         />
                     }
                     centerComponent={
-                        <Text style={{color: Color.White, fontSize: 20}}>Result</Text>
+                        <Text style={{color: Color.White, fontSize: 20}}>Nông dân: { this.state.customer_name }</Text>
                     }
                 />
                 <CalculatorComponent

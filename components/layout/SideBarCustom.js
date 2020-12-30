@@ -114,6 +114,7 @@ class SideBarCustom extends React.Component{
                        <Row size={12} style={[styles.body, styles.rowVersion]}>
                            <View style={{width: '100%'}}>
                                <Text style={styles.textVersion}>Phiên bản v1.0.0</Text>
+                               <Text style={[styles.textVersion]}>{'\u00A9'}Copyright nam.quach</Text>
                            </View>
                        </Row>
                    </Grid>

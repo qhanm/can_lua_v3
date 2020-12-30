@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, View, SafeAreaView, TouchableOpacity, Text, Alert, StyleSheet} from "react-native";
+import {ScrollView, View, SafeAreaView, TouchableOpacity, Text, Alert, StyleSheet, RefreshControl} from "react-native";
 import CustomerComponent from "./CustomerComponent";
 import {deleteCustomer, getCustomerByClient, getSheets} from "../../databases/Setup";
 import {SessionContext} from "../../context/SessionProvider";
@@ -67,17 +67,25 @@ class ListCustomer extends React.Component
         })
     }
 
+    __onRefresh = () => {
+        this.loadCustomer(this.props.client_id);
+    }
+
     render() {
 
         const { navigation } = this.props;
-       console.log(this.state.customers);
 
         return (
             <SessionContext.Consumer>
                 {
                     sessionContext => (
                         <SafeAreaView>
-                            <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
+                            <ScrollView
+                                contentContainerStyle={{ paddingBottom: 200 }}
+                                refreshControl={
+                                    <RefreshControl refreshing={false} onRefresh={() => { this.__onRefresh() }} />
+                                }
+                            >
                                 <ToastContext.Consumer>
                                     {({ toast }) => {
                                         return (
@@ -89,7 +97,7 @@ class ListCustomer extends React.Component
                                                                 style={[styles.column, {borderBottomColor: Color.Red,borderBottomWidth: 1}]}
                                                             >
                                                                 <View style={styles.row}>
-                                                                    <TouchableOpacity onPress={() => { navigation.navigate('CalculatorScreen', {customer_id: customer.id}) }}>
+                                                                    <TouchableOpacity onPress={() => { navigation.navigate('CalculatorScreen', {customer_id: customer.id, customer_name: customer.ten}) }}>
                                                                         <Text style={[styles.text, {fontSize: 18, color: Color.Navy}]}>{ customer.ten } - { customer.ten_giong }</Text>
                                                                     </TouchableOpacity>
                                                                     <TouchableOpacity
@@ -126,7 +134,7 @@ class ListCustomer extends React.Component
                                                                           color={Color.Blue}
                                                                     />
                                                                     <Text style={[styles.text, {marginLeft: 10, fontSize: 15}]}>
-                                                                        KL: { customer.klcl } Kg x { customer.gia_mua } VND
+                                                                        KL: { customer.klcl.toFixed(2) } Kg x { customer.gia_mua } VND
                                                                     </Text>
                                                                 </View>
                                                             </View>

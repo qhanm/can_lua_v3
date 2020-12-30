@@ -38,7 +38,7 @@ export default class AddClientScreen extends Component
                         />
                     }
                     centerComponent={
-                        <Text style={{color: Color.White, fontSize: 20}}>NULL</Text>
+                        <Text style={{color: Color.White, fontSize: 20}}>Thêm Bảng Tính</Text>
                     }
                 />
                 <AddClientComponent navigation={ this.props.navigation }/>

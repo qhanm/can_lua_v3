@@ -77,7 +77,7 @@ export default class SheetItemComponent extends React.Component
 
         let lengthInput = this.props.qcmc === '0' ? 2 : 3;
 
-        if(lengthInput === value.length){
+        if(lengthInput <= value.length){
             if(iFor !== 24){
                 this.refs['next'+(iFor+1)].focus();
                 sheetItemFocus[iFor + 1].autoFocus = true;

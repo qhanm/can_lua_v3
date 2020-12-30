@@ -119,31 +119,29 @@ export default class CalculatorComponent extends React.Component
             customer: {
                 tbb: 0,
                 qcmc: 0,
-                tong_kl: 0,
-                gia_mua: 0,
-                slb: 0,
-                klbb: 0,
-                klcl: 0,
-                tt: 0,
-                is_unblock: 0,
-                is_calculate: 0,
             },
+            sheets: [],
+            tongKhoiLuong: 0,
+            totalBao: 0,
             customerTemp: {
-                giaMua: 0,
                 truBiBao: 0,
+                quyCachMaCan: 0,
+                giaMua: 0,
             },
         }
     }
 
     componentDidMount() {
         this.loadCustomer(this.props.customer);
+        this.loadSheet(this.props.customer);
     }
 
     loadCustomer = (customer_id) => {
         getOneCustomer(customer_id).then((customer) => {
             let customerTemp = {
-                giaMua: customer.gia_mua,
                 truBiBao: customer.tbb,
+                quyCachMaCan: customer.qcmc,
+                giaMua: customer.gia_mua,
             }
             this.setState({ customer, customerTemp });
         }).catch((error) => {
@@ -151,6 +149,16 @@ export default class CalculatorComponent extends React.Component
         })
     }
 
+    loadSheet = (customer_id) => {
+        getSheets(customer_id).then((sheets) => {
+            let { tongKhoiLuong, totalBao } = this.state;
+            sheets.map((sheet) => {
+                tongKhoiLuong = tongKhoiLuong + Helpers.ConvertStringToInt(sheet.result);
+                totalBao = totalBao + sheet.totalBao;
+            })
+            this.setState({ sheets, tongKhoiLuong, totalBao })
+        }).catch((error) => { console.log(error) })
+    }
     __handleOnClickButton = () => {
         const { customer } = this.state;
         if(customer.is_unblock === 0){
@@ -161,20 +169,12 @@ export default class CalculatorComponent extends React.Component
             })
 
             createSheet(1, customer.id).then((result) => {
-                this.props.navigation.navigate('SheetScreen', {
-                    customer_id: customer.id,
-                    is_calculate: customer.is_calculate,
-                    customer_name: customer.ten,
-                });
+                this.props.navigation.navigate('SheetScreen', { customer_id: customer.id, is_calculate: customer.is_calculate });
             }).catch((error) => {
                 console.log(error);
             })
         }else{
-            this.props.navigation.navigate('SheetScreen', {
-                customer_id: customer.id,
-                is_calculate: customer.is_calculate,
-                customer_name: customer.ten,
-            });
+            this.props.navigation.navigate('SheetScreen', { customer_id: customer.id, is_calculate: customer.is_calculate });
         }
 
     }
@@ -187,6 +187,31 @@ export default class CalculatorComponent extends React.Component
             customerTemp.giaMua = Helpers.ConvertStringToInt(value);
         }
         this.setState({ customerTemp })
+    }
+
+    __calculateResult = () => {
+
+    }
+
+    __calculateKLCL = () => {
+        let { customer, tongKhoiLuong, totalBao } = this.state;
+        return (parseFloat(this.__calculateTotalResult(tongKhoiLuong, customer.qcmc )) - parseFloat(this.__calculateKLBB(totalBao, customer.tbb))).toFixed(1).toString();
+    }
+    __calculateKLBB = (slb, tbb) => {
+        return parseFloat(slb / tbb).toFixed(1).toString();
+    }
+    __calculateTotalResult = (total, cqcm) => {
+        if(cqcm === 0){
+            return total.toString();
+        }
+
+        return (total / 10).toString();
+    }
+
+    __calculateTT = () => {
+        let { customer } = this.state;
+        let tt = (parseFloat(this.__calculateKLCL())) * customer.gia_mua;
+        return Helpers.formatCurrency(tt, '');
     }
 
     __handleOnSubmitUpdateTBB = (event, type) => {
@@ -205,8 +230,8 @@ export default class CalculatorComponent extends React.Component
     }
 
     render() {
-        const { customer, customerTemp } = this.state;
-
+        const { customer, sheets, tongKhoiLuong, totalBao, customerTemp } = this.state;
+        //console.log(customer);
         return (
             <SafeAreaView>
                 <ScrollView contentContainerStyle={{ paddingBottom: 200}}>
@@ -252,7 +277,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput]}
                                                     //placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ customer.tong_kl.toString() }
+                                                    value={ this.__calculateTotalResult(tongKhoiLuong, customer.qcmc) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -272,7 +297,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
                                                     placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ customer.slb.toString() }
+                                                    value={ totalBao.toString() }
                                                     placeholderTextColor={Color.Red}
                                                 />
                                             </View>
@@ -315,7 +340,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
                                                     placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ customer.klbb.toFixed(2) }
+                                                    value={ this.__calculateKLBB(totalBao, customer.tbb) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -336,7 +361,7 @@ export default class CalculatorComponent extends React.Component
                                                     placeholder='0'
                                                     keyboardType='numeric'
                                                     editable={false}
-                                                    value={ customer.klcl.toFixed(2) }
+                                                    value={ this.__calculateKLCL() }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -381,7 +406,7 @@ export default class CalculatorComponent extends React.Component
                                                     keyboardType='numeric'
                                                     placeholderTextColor={Color.Red}
                                                     editable={false}
-                                                    value={ Helpers.formatCurrency(customer.tt, '') }
+                                                    value={ this.__calculateTT() }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>

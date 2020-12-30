@@ -13,11 +13,12 @@ class SheetScreen extends React.Component
 
         let customer_id = this.props.route.params.customer_id;
         let is_calculate = this.props.route.params.is_calculate;
+        let customer_name = this.props.route.params.customer_name;
         this.state = {
             customer_id: customer_id,
             is_calculate: is_calculate,
+            customer_name: customer_name,
         }
-        console.log('Sheet screen: ', this.props.route.params.is_calculate);
     }
     __handleClickGoBackCustomer = () => {
         this.props.navigation.navigate('CustomerScreen');
@@ -37,7 +38,7 @@ class SheetScreen extends React.Component
                         />
                     }
                     centerComponent={
-                        <Text style={{color: Color.White, fontSize: 20}}>NULL</Text>
+                        <Text style={{color: Color.White, fontSize: 20}}>Nông dân { this.state.customer_name }</Text>
                     }
                 />
                 <SheetsComponent

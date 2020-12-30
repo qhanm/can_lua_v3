@@ -126,7 +126,7 @@ const databaseOptions = {
 
 export const getAllClientGroup = () => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
-        let clientGroup = realm.objects((Schema.ClientGroups));
+        let clientGroup = realm.objects((Schema.ClientGroups)).sorted('date', true);
         resolve(clientGroup);
     }).catch((error) => { reject(error) })
 })
@@ -209,7 +209,7 @@ export const  deleteCustomer = (customer_id) => new Promise((resolve, reject) =>
 
 export const getClientByGroup = (group) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
-        const clients = realm.objects(Schema.Clients).filtered('date = $0', group);
+        const clients = realm.objects(Schema.Clients).filtered('date = $0', group).sorted('id', true);
         resolve(clients);
     }).catch((error) => { reject(error) })
 })
@@ -217,7 +217,7 @@ export const getClientByGroup = (group) => new Promise((resolve, reject) => {
 export const getCustomerByClient = (client_id) => new Promise((resolve, reject) => {
     Realm.open(databaseOptions).then((realm) => {
         realm.write(() => {
-            let customers = realm.objects(Schema.Customers).filtered('client_id = $0', client_id);
+            let customers = realm.objects(Schema.Customers).filtered('client_id = $0', client_id).sorted('id', true);
 
             if(customers !== undefined)
             {
@@ -306,8 +306,12 @@ export const updateCustomerByOption = (id, type, value) => new Promise((resolve,
         realm.write(() => {
             if(type === 'giaMua'){
                 customer.gia_mua = parseFloat(value);
+                customer.tt = customer.gia_mua * customer.klcl;
             }else if(type === 'tbb'){
                 customer.tbb = parseInt(value);
+                customer.klbb = customer.slb / customer.tbb;
+                customer.klcl = customer.tong_kl - customer.klbb
+                customer.tt = customer.gia_mua * customer.klcl;
             }
 
             resolve(customer);
