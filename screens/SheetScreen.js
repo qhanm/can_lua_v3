@@ -14,10 +14,12 @@ class SheetScreen extends React.Component
         let customer_id = this.props.route.params.customer_id;
         let is_calculate = this.props.route.params.is_calculate;
         let customer_name = this.props.route.params.customer_name;
+        let qcmc = this.props.route.params.qcmc;
         this.state = {
             customer_id: customer_id,
             is_calculate: is_calculate,
             customer_name: customer_name,
+            qcmc: qcmc,
         }
     }
     __handleClickGoBackCustomer = () => {
@@ -45,6 +47,7 @@ class SheetScreen extends React.Component
                     navigation={this.props.navigation}
                     customer_id={ this.state.customer_id }
                     is_calculate={ this.state.is_calculate }
+                    qcmc={ this.state.qcmc }
                 />
             </View>
         );

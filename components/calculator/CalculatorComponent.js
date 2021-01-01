@@ -165,6 +165,7 @@ export default class CalculatorComponent extends React.Component
                     customer_id: customer.id,
                     is_calculate: customer.is_calculate,
                     customer_name: customer.ten,
+                    qcmc: customer.qcmc,
                 });
             }).catch((error) => {
                 console.log(error);
@@ -174,6 +175,7 @@ export default class CalculatorComponent extends React.Component
                 customer_id: customer.id,
                 is_calculate: customer.is_calculate,
                 customer_name: customer.ten,
+                qcmc: customer.qcmc,
             });
         }
 

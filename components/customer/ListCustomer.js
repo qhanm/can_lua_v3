@@ -74,7 +74,7 @@ class ListCustomer extends React.Component
     render() {
 
         const { navigation } = this.props;
-
+        //console.log(this.state.customers);
         return (
             <SessionContext.Consumer>
                 {

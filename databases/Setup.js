@@ -308,6 +308,16 @@ export const updateCustomerByOption = (id, type, value) => new Promise((resolve,
                 customer.gia_mua = parseFloat(value);
                 customer.tt = customer.gia_mua * customer.klcl;
             }else if(type === 'tbb'){
+
+                // can chang
+                if(customer.qcmc === 0){
+                    customer.tong_kl = tong_kl;
+                }
+                // can le
+                else{
+                    customer.tong_kl = parseFloat(tong_kl / 10);
+                }
+
                 customer.tbb = parseInt(value);
                 customer.klbb = customer.slb / customer.tbb;
                 customer.klcl = customer.tong_kl - customer.klbb

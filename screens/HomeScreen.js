@@ -21,7 +21,6 @@ class HomeScreen extends React.Component
         super(props);
     }
 
-
     __handleOnClickAddClient = () => {
         this.props.navigation.navigate('AddClientScreen');
     }

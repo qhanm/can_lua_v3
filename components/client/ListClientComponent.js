@@ -17,7 +17,22 @@ class ListClientComponent extends React.Component
             isPullRefresh: false,
         }
 
+        this.willForcuClientList = this.props.navigation.addListener(
+            'focus',
+            payload => {
+                console.log('reload');
+                getAllClientGroup().then((realm) => {
+                    if(this._isSetState){
+                        this.setState({clientGroup: realm});
+                    }
+                }).catch((error) => {
+                    console.log(error);
+                })
+            }
+        );
+
     }
+
     componentDidMount(): void {
         this._isSetState = true;
         getAllClientGroup().then((realm) => {
@@ -31,6 +46,7 @@ class ListClientComponent extends React.Component
 
     componentWillUnmount() {
         this._isSetState = false;
+        this.willForcuClientList.remove();
     }
 
     getHeightView = (event) => {

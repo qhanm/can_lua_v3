@@ -16,6 +16,7 @@ export default class SheetItemComponent extends React.Component
             rowResult: [],
             totalResult: 0,
             is_calculate: this.props.is_calculate,
+            qcmc: this.props.qcmc,
         }
 
         this.__updateSheetItem = this.__updateSheetItem.bind(this);
@@ -75,8 +76,8 @@ export default class SheetItemComponent extends React.Component
         let { tempSheetItems, sheetItemFocus, rowResult, totalResult, is_calculate } = this.state;
         tempSheetItems[iFor].value = value;
 
-        let lengthInput = this.props.qcmc === '0' ? 2 : 3;
-
+        let lengthInput = this.state.qcmc == 0 ? 2 : 3;
+        console.log(this.state.qcmc, lengthInput);
         if(lengthInput <= value.length){
             if(iFor !== 24){
                 this.refs['next'+(iFor+1)].focus();
@@ -152,8 +153,8 @@ export default class SheetItemComponent extends React.Component
             {
                 let customStyle;
 
-                let min = this.props.qcmc === 0 ? 40 : 400;
-                let max = this.props.qcmc === 0 ? 80 : 800;
+                let min = this.state.qcmc == 0 ? 40 : 400;
+                let max = this.state.qcmc == 0 ? 80 : 800;
 
                 if((Helpers.ConvertStringToInt(tempSheetItems[i].value) >= max || Helpers.ConvertStringToInt(tempSheetItems[i].value) <= min) && tempSheetItems[i].value !== ''){
                     customStyle = [DefaultStyle.InputNumber, styles.textInputRed];
@@ -198,6 +199,7 @@ export default class SheetItemComponent extends React.Component
     }
 
     render () {
+
         let contentRender = [];
 
         for(let i = 0; i < 5; i++)

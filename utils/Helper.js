@@ -7,6 +7,7 @@ const GetDateCurrent = () => {
     }
 
     let month = date.getMonth();
+    month = month + 1;
     if(month < 10){
         month = '0' + month;
     }
