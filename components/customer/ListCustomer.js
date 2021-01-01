@@ -1,7 +1,7 @@
 import React from 'react';
 import {ScrollView, View, SafeAreaView, TouchableOpacity, Text, Alert, StyleSheet, RefreshControl} from "react-native";
 import CustomerComponent from "./CustomerComponent";
-import {deleteCustomer, getCustomerByClient, getSheets} from "../../databases/Setup";
+import {deleteCustomer, getAllClientGroup, getCustomerByClient, getSheets} from "../../databases/Setup";
 import {SessionContext} from "../../context/SessionProvider";
 import Helpers from "../../utils/Helper";
 import {Color, DefaultStyle, Font} from "../../utils/Constant";
@@ -17,7 +17,13 @@ class ListCustomer extends React.Component
         this.state = {
             customers: []
         }
-        //console.log(this.props.client_id);
+
+        this.willForcuCustomerList = this.props.navigation.addListener(
+            'focus',
+            payload => {
+                this.loadCustomer(this.props.client_id);
+            }
+        );
     }
 
     componentDidMount() : void {
@@ -30,6 +36,7 @@ class ListCustomer extends React.Component
 
     componentWillUnmount() {
         this.isSetState = false;
+        this.willForcuCustomerList();
     }
 
     loadCustomer = (client_id) => {
@@ -134,7 +141,7 @@ class ListCustomer extends React.Component
                                                                           color={Color.Blue}
                                                                     />
                                                                     <Text style={[styles.text, {marginLeft: 10, fontSize: 15}]}>
-                                                                        KL: { customer.klcl.toFixed(2) } Kg x { customer.gia_mua } VND
+                                                                        KL: { Helpers.formatCurrency(customer.klcl.toFixed(2), null) } Kg x { customer.gia_mua } VND
                                                                     </Text>
                                                                 </View>
                                                             </View>

@@ -20,7 +20,6 @@ class ListClientComponent extends React.Component
         this.willForcuClientList = this.props.navigation.addListener(
             'focus',
             payload => {
-                console.log('reload');
                 getAllClientGroup().then((realm) => {
                     if(this._isSetState){
                         this.setState({clientGroup: realm});
@@ -46,7 +45,8 @@ class ListClientComponent extends React.Component
 
     componentWillUnmount() {
         this._isSetState = false;
-        this.willForcuClientList.remove();
+
+        this.willForcuClientList();
     }
 
     getHeightView = (event) => {

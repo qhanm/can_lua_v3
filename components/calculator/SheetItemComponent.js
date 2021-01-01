@@ -77,7 +77,6 @@ export default class SheetItemComponent extends React.Component
         tempSheetItems[iFor].value = value;
 
         let lengthInput = this.state.qcmc == 0 ? 2 : 3;
-        console.log(this.state.qcmc, lengthInput);
         if(lengthInput <= value.length){
             if(iFor !== 24){
                 this.refs['next'+(iFor+1)].focus();

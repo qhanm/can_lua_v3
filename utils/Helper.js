@@ -37,7 +37,9 @@ const GetFullDateCurrent = () => {
 }
 
 const formatCurrency = (n, currency) => {
-    return currency + n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+    //return currency + n.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+
+    return n.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
 
 

@@ -254,7 +254,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput]}
                                                     //placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ customer.tong_kl.toString() }
+                                                    value={ Helpers.formatCurrency(customer.tong_kl.toString(), null) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -317,7 +317,7 @@ export default class CalculatorComponent extends React.Component
                                                     style={[DefaultStyle.InputNumber, styles.textInput, {color: Color.Red}]}
                                                     placeholder='0'
                                                     keyboardType='numeric'
-                                                    value={ customer.klbb.toFixed(2) }
+                                                    value={ Helpers.formatCurrency(customer.klbb.toFixed(2), null) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
@@ -338,7 +338,7 @@ export default class CalculatorComponent extends React.Component
                                                     placeholder='0'
                                                     keyboardType='numeric'
                                                     editable={false}
-                                                    value={ customer.klcl.toFixed(2) }
+                                                    value={ Helpers.formatCurrency(customer.klcl.toFixed(2), null) }
                                                 />
                                             </View>
                                             <View style={{width: '20%'}}>
